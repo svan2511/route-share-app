@@ -24,7 +24,8 @@ class AuthService
 
         $this->otpRepository->invalidatePrevious($phone);
 
-        $otp = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        // $otp = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $otp = '1234'; // For testing purposes, use a fixed OTP. Replace with the above line in production.
 
         $this->otpRepository->create($phone, $otp, now()->addMinutes(10));
 
