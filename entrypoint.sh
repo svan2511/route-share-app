@@ -26,7 +26,7 @@ echo "PostgreSQL is up!"
 
 # Run Migrations
 echo "Running database migrations..."
-php artisan migrate --force
+php artisan migrate:fresh --force
 
 
 # Final Optimizations (After keys are set)
