@@ -50,6 +50,14 @@ class BookingRequestRepository
             ->first();
     }
 
+    public function findRejectedByUserAndLoad(int $userId, int $loadId): bool
+    {
+        return BookingRequest::where('user_id', $userId)
+            ->where('load_id', $loadId)
+            ->where('status', 'rejected')
+            ->exists();
+    }
+
     public function accept(BookingRequest $booking): bool
     {
         if ($booking->status !== 'pending') {

@@ -45,10 +45,15 @@ class LoadController extends Controller
         }
 
         $hasRequested = false;
+        $hasRejected = false;
         if ($request->user()) {
             $hasRequested = BookingRequest::where('user_id', $request->user()->id)
                 ->where('load_id', $id)
                 ->whereIn('status', ['pending', 'accepted'])
+                ->exists();
+            $hasRejected = BookingRequest::where('user_id', $request->user()->id)
+                ->where('load_id', $id)
+                ->where('status', 'rejected')
                 ->exists();
         }
 
@@ -56,6 +61,7 @@ class LoadController extends Controller
             'success' => true,
             'data' => new LoadResource($load),
             'has_requested' => $hasRequested,
+            'has_rejected' => $hasRejected,
         ]);
     }
 

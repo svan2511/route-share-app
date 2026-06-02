@@ -38,6 +38,11 @@ class BookingRequestController extends Controller
             return response()->json(['success' => false, 'message' => 'You have already requested this load.'], 422);
         }
 
+        $rejected = $this->bookingRepo->findRejectedByUserAndLoad($request->user()->id, $data['load_id']);
+        if ($rejected) {
+            return response()->json(['success' => false, 'message' => 'Your previous request was rejected by the owner.'], 422);
+        }
+
         $data['user_id'] = $request->user()->id;
         $data['owner_id'] = $load->user_id;
 
@@ -48,8 +53,8 @@ class BookingRequestController extends Controller
             fromUserId: $request->user()->id,
             type: 'request_sent',
             title: 'New Booking Request',
-            message: $request->user()->business_name ?? $request->user()->full_name
-                . ' wants to book your load from ' . $load->from_city . ' to ' . $load->to_city,
+            message: ($request->user()->business_name ?? $request->user()->full_name)
+                . ' sent a booking request on your ride.',
             loadId: $load->id,
             bookingId: $booking->id,
         );
@@ -146,13 +151,17 @@ class BookingRequestController extends Controller
 
         $notifyUserId = $isOwner ? $booking->user_id : $booking->owner_id;
 
+        $message = $isOwner
+            ? $cancellerName . ' has put your booking request on hold. You\'ll get an exact update shortly.'
+            : $cancellerName . ' cancelled the booking for '
+                . ($load->from_city ?? '') . ' to ' . ($load->to_city ?? '');
+
         $this->notificationService->sendNotification(
             userId: $notifyUserId,
             fromUserId: $cancelledBy,
             type: 'request_cancelled',
-            title: 'Booking Cancelled',
-            message: $cancellerName . ' cancelled the booking for '
-                . ($load->from_city ?? '') . ' to ' . ($load->to_city ?? ''),
+            title: $isOwner ? 'Booking On Hold' : 'Booking Cancelled',
+            message: $message,
             loadId: $load?->id,
             bookingId: $booking->id,
         );
