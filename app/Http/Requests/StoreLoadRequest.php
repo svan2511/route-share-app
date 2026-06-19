@@ -13,7 +13,7 @@ class StoreLoadRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'from_city' => ['required', 'string', 'max:255'],
             'to_city' => ['required', 'string', 'max:255', 'different:from_city'],
             'vehicle_type' => ['required', 'string', 'max:255'],
@@ -25,5 +25,15 @@ class StoreLoadRequest extends FormRequest
             'route_id' => ['nullable', 'integer', 'exists:routes,id'],
             'destination_stop_id' => ['nullable', 'integer', 'exists:route_stops,id'],
         ];
+
+        $load = $this->route('load');
+        if ($load) {
+            $hasAccepted = $load->bookingRequests()->where('status', 'accepted')->exists();
+            if ($hasAccepted) {
+                $rules['available_space'] = ['required', 'integer', 'min:0', 'max:100'];
+            }
+        }
+
+        return $rules;
     }
 }

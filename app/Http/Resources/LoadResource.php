@@ -26,6 +26,7 @@ class LoadResource extends JsonResource
             'status' => $this->status,
             'expires_at' => $this->expires_at,
             'destination_stop_id' => $this->destination_stop_id,
+            'route_snapshot' => $this->route_snapshot,
             'created_at' => $this->created_at,
         ];
     }

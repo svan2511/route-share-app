@@ -16,6 +16,7 @@ class BookingRequest extends Model
         'pickup_offset_minutes',
         'status',
         'goods_description',
+        'space_snapshot',
     ];
 
     protected function casts(): array

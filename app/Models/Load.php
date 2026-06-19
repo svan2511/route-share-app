@@ -26,6 +26,7 @@ class Load extends Model
         'status',
         'expires_at',
         'destination_stop_id',
+        'route_snapshot',
     ];
 
     protected function casts(): array
@@ -35,6 +36,7 @@ class Load extends Model
             'departure_time' => 'string',
             'expires_at' => 'datetime',
             'available_space' => 'integer',
+            'route_snapshot' => 'array',
         ];
     }
 

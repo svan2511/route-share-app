@@ -94,7 +94,16 @@ class LoadController extends Controller
             ], 422);
         }
 
-        $dto = StoreLoadDTO::fromRequest($request->validated());
+        $data = $request->validated();
+
+        $hasAccepted = BookingRequest::where('load_id', $load->id)
+            ->where('status', 'accepted')
+            ->exists();
+        if ($hasAccepted) {
+            $data['available_space'] = $load->available_space;
+        }
+
+        $dto = StoreLoadDTO::fromRequest($data);
         $this->loadService->updateLoad($load, $dto);
 
         return response()->json([

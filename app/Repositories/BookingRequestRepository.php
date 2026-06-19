@@ -69,7 +69,10 @@ class BookingRequestRepository
             return false;
         }
 
-        $booking->update(['status' => 'accepted']);
+        $booking->update([
+            'status' => 'accepted',
+            'space_snapshot' => $load->available_space,
+        ]);
         $load->update(['available_space' => 0]);
         return true;
     }
@@ -101,7 +104,7 @@ class BookingRequestRepository
         if ($wasAccepted) {
             $load = $booking->relatedLoad;
             if ($load) {
-                $load->update(['available_space' => 100]);
+                $load->update(['available_space' => $booking->space_snapshot ?? 100]);
             }
         }
         return true;

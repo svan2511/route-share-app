@@ -53,6 +53,7 @@ class LoadService
             'status' => 'active',
             'expires_at' => $expiresAt,
             'destination_stop_id' => $dto->destination_stop_id,
+            'route_snapshot' => $this->buildSnapshot($route),
         ]);
     }
 
@@ -80,6 +81,7 @@ class LoadService
             'phone' => $dto->phone,
             'expires_at' => $expiresAt,
             'destination_stop_id' => $dto->destination_stop_id,
+            'route_snapshot' => $this->buildSnapshot($route),
         ]);
     }
 
@@ -121,5 +123,27 @@ class LoadService
 
         $maxExpiry = now()->addHours(24);
         return $departureDatetime->lessThan($maxExpiry) ? $departureDatetime : $maxExpiry;
+    }
+
+    private function buildSnapshot(?\App\Models\Route $route): ?array
+    {
+        if (!$route) return null;
+
+        $route->loadMissing('stops');
+
+        return [
+            'id' => $route->id,
+            'route_id' => $route->id,
+            'route_name' => $route->route_name,
+            'from_city' => $route->from_city,
+            'to_city' => $route->to_city,
+            'destination_offset_minutes' => $route->destination_offset_minutes,
+            'stops' => $route->stops->map(fn($s) => [
+                'id' => $s->id,
+                'stop_name' => $s->stop_name,
+                'stop_order' => $s->stop_order,
+                'time_offset_minutes' => $s->time_offset_minutes,
+            ])->toArray(),
+        ];
     }
 }
