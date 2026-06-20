@@ -29,7 +29,7 @@ class BookingRequestController extends Controller
 
         $load = Load::findOrFail($data['load_id']);
 
-        if ($load->user_id === (int) $request->user()->id) {
+        if ((int) $load->user_id === (int) $request->user()->id) {
             return response()->json(['success' => false, 'message' => 'You cannot book your own load.'], 422);
         }
 
@@ -81,7 +81,7 @@ class BookingRequestController extends Controller
     public function accept(int $id, Request $request): JsonResponse
     {
         $booking = $this->bookingRepo->findById($id);
-        if (!$booking || $booking->owner_id !== (int) $request->user()->id) {
+        if (!$booking || (int) $booking->owner_id !== (int) $request->user()->id) {
             return response()->json(['success' => false, 'message' => 'Not found.'], 404);
         }
 
@@ -108,7 +108,7 @@ class BookingRequestController extends Controller
     public function reject(int $id, Request $request): JsonResponse
     {
         $booking = $this->bookingRepo->findById($id);
-        if (!$booking || $booking->owner_id !== (int) $request->user()->id) {
+        if (!$booking || (int) $booking->owner_id !== (int) $request->user()->id) {
             return response()->json(['success' => false, 'message' => 'Not found.'], 404);
         }
 
@@ -135,7 +135,7 @@ class BookingRequestController extends Controller
     public function cancel(int $id, Request $request): JsonResponse
     {
         $booking = $this->bookingRepo->findById($id);
-        if (!$booking || ($booking->user_id !== (int) $request->user()->id && $booking->owner_id !== (int) $request->user()->id)) {
+        if (!$booking || ((int) $booking->user_id !== (int) $request->user()->id && (int) $booking->owner_id !== (int) $request->user()->id)) {
             return response()->json(['success' => false, 'message' => 'Not found.'], 404);
         }
 
@@ -146,7 +146,7 @@ class BookingRequestController extends Controller
         }
 
         $load = $booking->relatedLoad;
-        $isOwner = $booking->owner_id === $cancelledBy;
+        $isOwner = (int) $booking->owner_id === $cancelledBy;
         $cancellerName = $request->user()->business_name ?? $request->user()->full_name;
 
         $notifyUserId = $isOwner ? $booking->user_id : $booking->owner_id;

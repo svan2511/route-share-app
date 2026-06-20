@@ -69,10 +69,7 @@ class BookingRequestRepository
             return false;
         }
 
-        $booking->update([
-            'status' => 'accepted',
-            'space_snapshot' => $load->available_space,
-        ]);
+        $booking->update(['status' => 'accepted']);
         $load->update(['available_space' => 0]);
         return true;
     }
@@ -92,7 +89,7 @@ class BookingRequestRepository
             return false;
         }
 
-        $isOwner = $userId && $booking->owner_id === $userId;
+        $isOwner = $userId && (int) $booking->owner_id === $userId;
         $wasAccepted = $booking->status === 'accepted';
 
         if ($isOwner && $wasAccepted) {
@@ -104,7 +101,7 @@ class BookingRequestRepository
         if ($wasAccepted) {
             $load = $booking->relatedLoad;
             if ($load) {
-                $load->update(['available_space' => $booking->space_snapshot ?? 100]);
+                $load->update(['available_space' => (int) ($booking->space_snapshot ?? $load->available_space)]);
             }
         }
         return true;
