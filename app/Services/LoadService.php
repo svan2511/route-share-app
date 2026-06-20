@@ -107,7 +107,7 @@ class LoadService
 
     public function canModify(User $user, Load $load): bool
     {
-        return $user->id === $load->user_id;
+        return (int) $user->id === (int) $load->user_id;
     }
 
     private function calculateExpiresAt(string $departureDate, string $departureTime, ?\App\Models\Route $route): \Carbon\Carbon
